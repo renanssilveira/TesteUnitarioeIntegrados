@@ -3,18 +3,19 @@ package com.teste.testeUnitarios.service;
 import com.teste.testeUnitarios.entidades.Filme;
 import com.teste.testeUnitarios.entidades.Locacao;
 import com.teste.testeUnitarios.entidades.Usuario;
+import com.teste.testeUnitarios.servicos.LocacaoService;
 import com.teste.testeUnitarios.utils.DataUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.Date;
 
-public class LocacaoService {
+public class LocacaoServiceTest {
 
     @Test
     public void teste() {
         //cenario
-        com.teste.testeUnitarios.servicos.LocacaoService service = new com.teste.testeUnitarios.servicos.LocacaoService();
+        LocacaoService service = new LocacaoService();
         Usuario user = new Usuario("Renan");
         Filme film = new Filme("teste", 2, 10.00);
         //ação
