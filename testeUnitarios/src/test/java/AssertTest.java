@@ -1,3 +1,4 @@
+import com.teste.testeUnitarios.entidades.Usuario;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -18,6 +19,19 @@ public class AssertTest {
         Assert.assertEquals("bola", "bola");
         Assert.assertTrue("bola".equalsIgnoreCase("Bola"));
         Assert.assertTrue("bola".startsWith("bo"));
+
+        Usuario u1 = new Usuario("Usuario 1");
+        Usuario u2 = new Usuario("Usuario 1");
+        Usuario u3 = null;
+
+        Assert.assertEquals(u1, u2);
+
+        Assert.assertSame(u2, u2);
+        Assert.assertNotSame(u1, u2);
+
+        Assert.assertNull(u3);
+
+
 
 
     }
