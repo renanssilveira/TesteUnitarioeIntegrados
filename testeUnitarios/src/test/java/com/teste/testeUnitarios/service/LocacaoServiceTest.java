@@ -1,5 +1,6 @@
 package com.teste.testeUnitarios.service;
 
+import builders.UsuarioBuilder;
 import com.teste.testeUnitarios.entidades.Filme;
 import com.teste.testeUnitarios.entidades.Locacao;
 import com.teste.testeUnitarios.entidades.Usuario;
@@ -14,9 +15,11 @@ import org.junit.rules.ErrorCollector;
 import org.junit.rules.ExpectedException;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import static builders.UsuarioBuilder.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
@@ -43,7 +46,7 @@ public class LocacaoServiceTest {
         contador++;
         log.info(String.valueOf(contador));
         filmes = new ArrayList<>();
-        usuario = new Usuario("Renan");
+        usuario = umUsuario().agora();
     }
 
     @After
@@ -205,5 +208,24 @@ public class LocacaoServiceTest {
 
         //verificação
         assertEquals(locacao.getValor(), 35, 0.2);
+    }
+
+    @Test
+    @Ignore
+    public void naoDeveDevolverFilmeDomingo() throws Exception {
+
+        //cenario
+        filmes.add(new Filme("teste1", 2, 10.00));
+        filmes.add(new Filme("teste2", 4, 10.00));
+        filmes.add(new Filme("teste3", 5, 10.00));
+        filmes.add(new Filme("teste4", 5, 10.00));
+        filmes.add(new Filme("teste5", 5, 10.00));
+        filmes.add(new Filme("teste6", 5, 10.00));
+        //ação
+        Locacao locacao = service.alugarFilme(usuario, filmes);
+
+        //verificação
+        Assert.assertTrue(
+        DataUtils.verificarDiaSemana(locacao.getDataRetorno(), Calendar.MONDAY));
     }
 }
