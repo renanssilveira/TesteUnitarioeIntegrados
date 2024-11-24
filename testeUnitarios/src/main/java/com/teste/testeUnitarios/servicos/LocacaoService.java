@@ -8,10 +8,9 @@ import com.teste.testeUnitarios.expections.LocadoraException;
 import com.teste.testeUnitarios.utils.DataUtils;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static java.util.Objects.isNull;
 
@@ -19,7 +18,8 @@ import static java.util.Objects.isNull;
 public class LocacaoService {
 
     public Locacao alugarFilme(Usuario usuario, List<Filme> filmes) throws Exception {
-
+        Locacao locacao = new Locacao();
+        locacao.setValor(0.0);
         if (isNull(usuario)) {
             throw new LocadoraException("Usuario Vazio");
         }
@@ -29,17 +29,17 @@ public class LocacaoService {
         }
 
         if (filmes.stream().anyMatch(filme -> filme.getEstoque().equals(0))) {
-                throw new FilmeSemEstoqueException("Filme Esgotado");
+            throw new FilmeSemEstoqueException("Filme Esgotado");
         }
 
+        implementaDesconto(filmes);
 
-        Locacao locacao = new Locacao();
         filmes.forEach(filme ->
                 {
                     locacao.setFilme(filme);
                     locacao.setUsuario(usuario);
                     locacao.setDataLocacao(new Date());
-                    locacao.setValor(filme.getPrecoLocacao());
+                    locacao.setValor(locacao.getValor() + filme.getPrecoLocacao());
                 }
         );
 
@@ -48,12 +48,27 @@ public class LocacaoService {
         Date dataEntrega = new Date();
         dataEntrega = DataUtils.adicionarDias(dataEntrega, 1);
         locacao.setDataRetorno(dataEntrega);
-
         //Salvando a locacao...
         //TODO adicionar método para salvar
 
         return locacao;
     }
 
+
+    private void implementaDesconto(List<Filme> filmes) {
+        AtomicInteger i = new AtomicInteger();
+        filmes.forEach(filme -> {
+            if (i.get() == 2) {
+                filme.setPrecoLocacao(filme.getPrecoLocacao() * 0.75);
+            } else if (i.get() == 3) {
+                filme.setPrecoLocacao(filme.getPrecoLocacao() * 0.5);
+            } else if (i.get() == 4) {
+                filme.setPrecoLocacao(filme.getPrecoLocacao() * 0.25);
+            } else if (i.get() == 5) {
+                filme.setPrecoLocacao(0.0);
+            }
+            i.getAndIncrement();
+        });
+    }
 
 }

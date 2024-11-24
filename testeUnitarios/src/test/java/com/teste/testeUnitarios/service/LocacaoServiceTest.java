@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 @Slf4j
@@ -27,6 +28,8 @@ public class LocacaoServiceTest {
     private static int contador = 0;
 
     private List<Filme> filmes;
+
+    private Usuario usuario;
 
     @Rule
     public ErrorCollector error = new ErrorCollector();
@@ -40,6 +43,7 @@ public class LocacaoServiceTest {
         contador++;
         log.info(String.valueOf(contador));
         filmes = new ArrayList<>();
+        usuario = new Usuario("Renan");
     }
 
     @After
@@ -62,10 +66,9 @@ public class LocacaoServiceTest {
     public void teste() throws Exception {
         //cenario
 
-        Usuario user = new Usuario("Renan");
         filmes.add(new Filme("teste", 2, 10.00));
         //ação
-        Locacao locacao = service.alugarFilme(user, filmes);
+        Locacao locacao = service.alugarFilme(usuario, filmes);
         //verificação
 
         Assert.assertEquals(10, locacao.getValor(), 0.0);
@@ -82,23 +85,21 @@ public class LocacaoServiceTest {
     @Test(expected = FilmeSemEstoqueException.class)
     public void test_FilmeSemEstoqueElegante() throws Exception {
         //cenario
-        LocacaoService service = new LocacaoService();
-        Usuario user = new Usuario("Renan");
+
         filmes.add(new Filme("teste", 0, 10.00));
         //ação
-        service.alugarFilme(user, filmes);
+        service.alugarFilme(usuario, filmes);
         //verificação
     }
 
     @Test
     public void test_FilmeSemEstoqueRobusta() {
         //cenario
-        LocacaoService service = new LocacaoService();
-        Usuario user = new Usuario("Renan");
+
         filmes.add(new Filme("teste", 0, 10.00));
         //ação
         try {
-            service.alugarFilme(user, filmes);
+            service.alugarFilme(usuario, filmes);
             fail();
         } catch (Exception e) {
             Assert.assertEquals(e.getMessage(), "Filme Esgotado");
@@ -109,21 +110,20 @@ public class LocacaoServiceTest {
     @Test
     public void test_FilmeSemEstoque3() throws Exception {
         //cenario
-        LocacaoService service = new LocacaoService();
-        Usuario user = new Usuario("Renan");
+
         filmes.add(new Filme("teste", 0, 10.00));
 
         exception.expect(FilmeSemEstoqueException.class);
         exception.expectMessage("Filme Esgotado");
         //ação
-        service.alugarFilme(user, filmes);
+        service.alugarFilme(usuario, filmes);
         //verificação
     }
 
     @Test
     public void test_UsuarioVazio() {
         //cenario
-        LocacaoService service = new LocacaoService();
+
         //Usuario user = null;
         filmes.add(new Filme("teste", 2, 10.00));
         try {
@@ -137,15 +137,73 @@ public class LocacaoServiceTest {
     @Test
     public void test_FilmeVazio() throws Exception {
         //cenario
-        LocacaoService service = new LocacaoService();
-        Usuario user = new Usuario("Renan");
+
         //Filme film = new Filme("teste", 0, 10.00);
 
         exception.expect(LocadoraException.class);
         exception.expectMessage("Filme Vazio");
         //ação
-        service.alugarFilme(user, null);
+        service.alugarFilme(usuario, null);
         //verificação
     }
 
+    @Test
+    public void devePagar75no3Filme() throws Exception {
+        //cenario
+        filmes.add(new Filme("teste1", 2, 10.00));
+        filmes.add(new Filme("teste2", 4, 10.00));
+        filmes.add(new Filme("teste3", 5, 10.00));
+
+        //ação
+        Locacao locacao = service.alugarFilme(usuario, filmes);
+
+        log.info(String.valueOf(locacao));
+        //verificação
+        assertEquals(locacao.getValor(), 27.5, 0.2);
+    }
+
+    @Test
+    public void devePagar50no4Filme() throws Exception {
+        //cenario
+        filmes.add(new Filme("teste1", 2, 10.00));
+        filmes.add(new Filme("teste2", 4, 10.00));
+        filmes.add(new Filme("teste3", 5, 10.00));
+        filmes.add(new Filme("teste4", 5, 10.00));
+        //ação
+        Locacao locacao = service.alugarFilme(usuario, filmes);
+
+        //verificação
+        assertEquals(locacao.getValor(), 32.5, 0.2);
+    }
+
+    @Test
+    public void devePagar25no5Filme() throws Exception {
+        //cenario
+        filmes.add(new Filme("teste1", 2, 10.00));
+        filmes.add(new Filme("teste2", 4, 10.00));
+        filmes.add(new Filme("teste3", 5, 10.00));
+        filmes.add(new Filme("teste4", 5, 10.00));
+        filmes.add(new Filme("teste5", 5, 10.00));
+        //ação
+        Locacao locacao = service.alugarFilme(usuario, filmes);
+
+        //verificação
+        assertEquals(locacao.getValor(), 35, 0.2);
+    }
+
+    @Test
+    public void devePagar0no6Filme() throws Exception {
+        //cenario
+        filmes.add(new Filme("teste1", 2, 10.00));
+        filmes.add(new Filme("teste2", 4, 10.00));
+        filmes.add(new Filme("teste3", 5, 10.00));
+        filmes.add(new Filme("teste4", 5, 10.00));
+        filmes.add(new Filme("teste5", 5, 10.00));
+        filmes.add(new Filme("teste6", 5, 10.00));
+        //ação
+        Locacao locacao = service.alugarFilme(usuario, filmes);
+
+        //verificação
+        assertEquals(locacao.getValor(), 35, 0.2);
+    }
 }
