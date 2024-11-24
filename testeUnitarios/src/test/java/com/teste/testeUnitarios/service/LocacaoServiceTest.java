@@ -13,7 +13,9 @@ import org.junit.*;
 import org.junit.rules.ErrorCollector;
 import org.junit.rules.ExpectedException;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import static org.junit.Assert.fail;
 
@@ -23,6 +25,8 @@ public class LocacaoServiceTest {
     private LocacaoService service;
 
     private static int contador = 0;
+
+    private List<Filme> filmes;
 
     @Rule
     public ErrorCollector error = new ErrorCollector();
@@ -35,6 +39,7 @@ public class LocacaoServiceTest {
         service = new LocacaoService();
         contador++;
         log.info(String.valueOf(contador));
+        filmes = new ArrayList<>();
     }
 
     @After
@@ -58,9 +63,9 @@ public class LocacaoServiceTest {
         //cenario
 
         Usuario user = new Usuario("Renan");
-        Filme film = new Filme("teste", 2, 10.00);
+        filmes.add(new Filme("teste", 2, 10.00));
         //ação
-        Locacao locacao = service.alugarFilme(user, film);
+        Locacao locacao = service.alugarFilme(user, filmes);
         //verificação
 
         Assert.assertEquals(10, locacao.getValor(), 0.0);
@@ -79,9 +84,9 @@ public class LocacaoServiceTest {
         //cenario
         LocacaoService service = new LocacaoService();
         Usuario user = new Usuario("Renan");
-        Filme film = new Filme("teste", 0, 10.00);
+        filmes.add(new Filme("teste", 0, 10.00));
         //ação
-        service.alugarFilme(user, film);
+        service.alugarFilme(user, filmes);
         //verificação
     }
 
@@ -90,10 +95,10 @@ public class LocacaoServiceTest {
         //cenario
         LocacaoService service = new LocacaoService();
         Usuario user = new Usuario("Renan");
-        Filme film = new Filme("teste", 0, 10.00);
+        filmes.add(new Filme("teste", 0, 10.00));
         //ação
         try {
-            service.alugarFilme(user, film);
+            service.alugarFilme(user, filmes);
             fail();
         } catch (Exception e) {
             Assert.assertEquals(e.getMessage(), "Filme Esgotado");
@@ -106,12 +111,12 @@ public class LocacaoServiceTest {
         //cenario
         LocacaoService service = new LocacaoService();
         Usuario user = new Usuario("Renan");
-        Filme film = new Filme("teste", 0, 10.00);
+        filmes.add(new Filme("teste", 0, 10.00));
 
         exception.expect(FilmeSemEstoqueException.class);
         exception.expectMessage("Filme Esgotado");
         //ação
-        service.alugarFilme(user, film);
+        service.alugarFilme(user, filmes);
         //verificação
     }
 
@@ -120,9 +125,9 @@ public class LocacaoServiceTest {
         //cenario
         LocacaoService service = new LocacaoService();
         //Usuario user = null;
-        Filme film = new Filme("teste", 2, 10.00);
+        filmes.add(new Filme("teste", 2, 10.00));
         try {
-            service.alugarFilme(null, film);
+            service.alugarFilme(null, filmes);
         } catch (Exception e) {
             Assert.assertEquals(e.getMessage(), "Usuario Vazio");
         }
