@@ -1,4 +1,4 @@
-package com.teste.testeUnitarios;
+package com.teste.testeUnitarios.Dao;
 
 import com.teste.testeUnitarios.entidades.Locacao;
 

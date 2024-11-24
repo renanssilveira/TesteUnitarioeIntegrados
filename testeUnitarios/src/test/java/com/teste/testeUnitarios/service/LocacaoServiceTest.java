@@ -1,18 +1,23 @@
 package com.teste.testeUnitarios.service;
 
-import builders.UsuarioBuilder;
+import com.teste.testeUnitarios.Dao.LocacaoDao;
 import com.teste.testeUnitarios.entidades.Filme;
 import com.teste.testeUnitarios.entidades.Locacao;
 import com.teste.testeUnitarios.entidades.Usuario;
 import com.teste.testeUnitarios.expections.FilmeSemEstoqueException;
 import com.teste.testeUnitarios.expections.LocadoraException;
 import com.teste.testeUnitarios.servicos.LocacaoService;
+import com.teste.testeUnitarios.servicos.SpcService;
 import com.teste.testeUnitarios.utils.DataUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.hamcrest.CoreMatchers;
 import org.junit.*;
 import org.junit.rules.ErrorCollector;
 import org.junit.rules.ExpectedException;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -26,13 +31,22 @@ import static org.junit.Assert.fail;
 @Slf4j
 public class LocacaoServiceTest {
 
+
+    @InjectMocks
     private LocacaoService service;
 
-    private static int contador = 0;
 
+    @Mock
     private List<Filme> filmes;
 
+    @Mock
     private Usuario usuario;
+
+    @Mock
+    private LocacaoDao locacaoDao;
+
+    @Mock
+    private SpcService spcService;
 
     @Rule
     public ErrorCollector error = new ErrorCollector();
@@ -40,11 +54,10 @@ public class LocacaoServiceTest {
     @Rule
     public ExpectedException exception = ExpectedException.none();
 
+
     @Before
     public void setup() {
-        service = new LocacaoService();
-        contador++;
-        log.info(String.valueOf(contador));
+        MockitoAnnotations.openMocks(this);
         filmes = new ArrayList<>();
         usuario = umUsuario().agora();
     }
@@ -227,5 +240,19 @@ public class LocacaoServiceTest {
         //verificação
         Assert.assertTrue(
         DataUtils.verificarDiaSemana(locacao.getDataRetorno(), Calendar.MONDAY));
+    }
+
+    @Test
+    public void naoAlugaFilmeNegativado() throws Exception {
+        filmes.add(new Filme("teste1", 2, 10.00));
+
+        Mockito.when(spcService.possuiNegativacvao(usuario)).thenReturn(true);
+        exception.expect(LocadoraException.class);
+        exception.expectMessage("Usuario Negativado");
+        //ação
+        Locacao locacao = service.alugarFilme(usuario, filmes);
+
+
+        //Verificação
     }
 }

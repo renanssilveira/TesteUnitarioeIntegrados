@@ -44,6 +44,12 @@
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-core</artifactId>
+			<version>5.5.0</version> <!-- Certifique-se de usar uma versão recente -->
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 
 	<build>

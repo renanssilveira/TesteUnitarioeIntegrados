@@ -1,16 +1,22 @@
 package com.teste.testeUnitarios.service;
 
+import com.teste.testeUnitarios.Dao.LocacaoDao;
 import com.teste.testeUnitarios.entidades.Filme;
 import com.teste.testeUnitarios.entidades.Locacao;
 import com.teste.testeUnitarios.entidades.Usuario;
 import com.teste.testeUnitarios.expections.FilmeSemEstoqueException;
 import com.teste.testeUnitarios.servicos.LocacaoService;
+import com.teste.testeUnitarios.servicos.SpcService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -22,7 +28,13 @@ import static org.junit.Assert.assertThat;
 @RunWith(Parameterized.class)
 public class CalculoValorLocacaoTest {
 
+    @InjectMocks
     private LocacaoService service;
+    @Mock
+    private LocacaoDao locacaoDao;
+
+    @Mock
+    private SpcService spcService;
 
     @Parameter
     public List<Filme> filmes;
@@ -35,7 +47,7 @@ public class CalculoValorLocacaoTest {
 
     @Before
     public void setup() {
-        service = new LocacaoService();
+        MockitoAnnotations.openMocks(this);
     }
 
     private static Filme filme1 = new Filme("Filme 1", 2, 10.00);
