@@ -24,6 +24,8 @@ public class LocacaoService {
 
     private SpcService spcService;
 
+    private EmailService emailService;
+
     public Locacao alugarFilme(Usuario usuario, List<Filme> filmes) throws Exception {
         Locacao locacao = new Locacao();
         locacao.setValor(0.0);
@@ -39,7 +41,7 @@ public class LocacaoService {
             throw new FilmeSemEstoqueException("Filme Esgotado");
         }
 
-        if(spcService.possuiNegativacvao(usuario)){
+        if (spcService.possuiNegativacvao(usuario)) {
             throw new LocadoraException("Usuario Negativado");
         }
 
@@ -58,7 +60,7 @@ public class LocacaoService {
         //Entrega no dia seguinte
         Date dataEntrega = new Date();
         dataEntrega = DataUtils.adicionarDias(dataEntrega, 1);
-        if(DataUtils.verificarDiaSemana(dataEntrega, Calendar.SUNDAY)){
+        if (DataUtils.verificarDiaSemana(dataEntrega, Calendar.SUNDAY)) {
             dataEntrega = DataUtils.adicionarDias(dataEntrega, 1);
         }
         locacao.setDataRetorno(dataEntrega);
@@ -84,5 +86,10 @@ public class LocacaoService {
             }
             i.getAndIncrement();
         });
+    }
+
+    public void notificarAtrasos() {
+        List<Locacao> locacaos = locacaoDao.ObterLocacoesPendentes();
+        locacaos.forEach(locacao -> emailService.notificarAtraso(locacao.getUsuario()));
     }
 }

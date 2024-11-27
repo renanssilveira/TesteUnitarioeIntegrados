@@ -1,11 +1,14 @@
 package com.teste.testeUnitarios.service;
 
+import builders.LocacaoBuilder;
+import builders.UsuarioBuilder;
 import com.teste.testeUnitarios.Dao.LocacaoDao;
 import com.teste.testeUnitarios.entidades.Filme;
 import com.teste.testeUnitarios.entidades.Locacao;
 import com.teste.testeUnitarios.entidades.Usuario;
 import com.teste.testeUnitarios.expections.FilmeSemEstoqueException;
 import com.teste.testeUnitarios.expections.LocadoraException;
+import com.teste.testeUnitarios.servicos.EmailService;
 import com.teste.testeUnitarios.servicos.LocacaoService;
 import com.teste.testeUnitarios.servicos.SpcService;
 import com.teste.testeUnitarios.utils.DataUtils;
@@ -19,14 +22,13 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.lang.reflect.Array;
+import java.util.*;
 
 import static builders.UsuarioBuilder.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.verify;
 
 @Slf4j
 public class LocacaoServiceTest {
@@ -48,6 +50,9 @@ public class LocacaoServiceTest {
     @Mock
     private SpcService spcService;
 
+    @Mock
+    private EmailService emailService;
+
     @Rule
     public ErrorCollector error = new ErrorCollector();
 
@@ -60,6 +65,7 @@ public class LocacaoServiceTest {
         MockitoAnnotations.openMocks(this);
         filmes = new ArrayList<>();
         usuario = umUsuario().agora();
+
     }
 
     @After
@@ -238,8 +244,7 @@ public class LocacaoServiceTest {
         Locacao locacao = service.alugarFilme(usuario, filmes);
 
         //verificação
-        Assert.assertTrue(
-        DataUtils.verificarDiaSemana(locacao.getDataRetorno(), Calendar.MONDAY));
+        Assert.assertTrue(DataUtils.verificarDiaSemana(locacao.getDataRetorno(), Calendar.MONDAY));
     }
 
     @Test
@@ -252,7 +257,23 @@ public class LocacaoServiceTest {
         //ação
         Locacao locacao = service.alugarFilme(usuario, filmes);
 
-
         //Verificação
+        Mockito.verify(spcService).possuiNegativacvao(usuario);
+    }
+
+    @Test
+    public void deveEnviarEmailLocacaoAtrasada() {
+        //cenario
+        filmes.add(new Filme("teste1", 2, 10.00));
+        //[Usuario usuario1 = new Usuario("Jose"); // Apenas para validar se esta certo
+        List<Locacao> locacaos = Arrays.asList(LocacaoBuilder.umLocacao().comDataRetorno(DataUtils.obterDataComDiferencaDias(-2)).agora());
+        Mockito.when(spcService.possuiNegativacvao(usuario)).thenReturn(false);
+        Mockito.when(locacaoDao.ObterLocacoesPendentes()).thenReturn(locacaos);
+        //ação
+        service.notificarAtrasos();
+
+        //Verificacao
+        verify(emailService).notificarAtraso(usuario);
+
     }
 }
