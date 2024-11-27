@@ -90,6 +90,10 @@ public class LocacaoService {
 
     public void notificarAtrasos() {
         List<Locacao> locacaos = locacaoDao.ObterLocacoesPendentes();
-        locacaos.forEach(locacao -> emailService.notificarAtraso(locacao.getUsuario()));
+        locacaos.forEach(locacao -> {
+            if(locacao.getDataRetorno().before(new Date())) {
+                emailService.notificarAtraso(locacao.getUsuario());
+            }
+        });
     }
 }

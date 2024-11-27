@@ -25,10 +25,12 @@ import org.mockito.MockitoAnnotations;
 import java.lang.reflect.Array;
 import java.util.*;
 
+import static builders.LocacaoBuilder.umLocacao;
 import static builders.UsuarioBuilder.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 @Slf4j
 public class LocacaoServiceTest {
@@ -265,15 +267,26 @@ public class LocacaoServiceTest {
     public void deveEnviarEmailLocacaoAtrasada() {
         //cenario
         filmes.add(new Filme("teste1", 2, 10.00));
-        //[Usuario usuario1 = new Usuario("Jose"); // Apenas para validar se esta certo
-        List<Locacao> locacaos = Arrays.asList(LocacaoBuilder.umLocacao().comDataRetorno(DataUtils.obterDataComDiferencaDias(-2)).agora());
+        Usuario usuario1 = new Usuario("Jose");
+        List<Locacao> locacaos = Arrays.asList(umLocacao()
+                        .atrasado().comUsuario(usuario)
+                        .agora(),
+                umLocacao()
+                        .atrasado().comUsuario(usuario)
+                        .agora(),
+                umLocacao().comUsuario(usuario1).agora(),
+                umLocacao().comUsuario(usuario1).agora());
         Mockito.when(spcService.possuiNegativacvao(usuario)).thenReturn(false);
         Mockito.when(locacaoDao.ObterLocacoesPendentes()).thenReturn(locacaos);
         //ação
         service.notificarAtrasos();
 
         //Verificacao
-        verify(emailService).notificarAtraso(usuario);
+        verify(emailService, Mockito.atLeastOnce()).notificarAtraso(Mockito.any(Usuario.class));
+        verify(emailService, Mockito.atLeastOnce()).notificarAtraso(usuario);
+        verify(emailService, Mockito.never()).notificarAtraso(usuario1);
+        verifyNoMoreInteractions(emailService);
+        Mockito.verifyNoInteractions(spcService);
 
     }
 }
