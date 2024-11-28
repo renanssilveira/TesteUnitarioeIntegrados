@@ -1,7 +1,6 @@
 package com.teste.testeUnitarios.service;
 
-import builders.LocacaoBuilder;
-import builders.UsuarioBuilder;
+import builders.FilmeBuilder;
 import com.teste.testeUnitarios.Dao.LocacaoDao;
 import com.teste.testeUnitarios.entidades.Filme;
 import com.teste.testeUnitarios.entidades.Locacao;
@@ -22,15 +21,13 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
-import java.lang.reflect.Array;
 import java.util.*;
 
 import static builders.LocacaoBuilder.umLocacao;
-import static builders.UsuarioBuilder.*;
+import static builders.UsuarioBuilder.umUsuario;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.*;
 
 @Slf4j
 public class LocacaoServiceTest {
@@ -38,7 +35,6 @@ public class LocacaoServiceTest {
 
     @InjectMocks
     private LocacaoService service;
-
 
     @Mock
     private List<Filme> filmes;
@@ -287,6 +283,28 @@ public class LocacaoServiceTest {
         verify(emailService, Mockito.never()).notificarAtraso(usuario1);
         verifyNoMoreInteractions(emailService);
         Mockito.verifyNoInteractions(spcService);
+
+    }
+
+    @Test
+    public void deveTratarErronoSPC() throws Exception {
+        //cenario
+        Usuario usuario1 = umUsuario().agora();
+        List<Filme> filmes1 = Arrays.asList(FilmeBuilder.umFilme().agora());
+
+        when(spcService.possuiNegativacvao(Mockito.any(Usuario.class))).thenThrow(new RuntimeException("Falha Maluca"));
+
+        //Verificacao
+        exception.expect(Exception.class);
+        exception.expectMessage("Falha Maluca");
+
+
+        //ação
+        service.alugarFilme(usuario1, filmes1);
+
+        //verificação
+
+
 
     }
 }
