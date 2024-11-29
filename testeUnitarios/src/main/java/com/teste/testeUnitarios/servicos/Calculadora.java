@@ -2,7 +2,9 @@ package com.teste.testeUnitarios.servicos;
 
 
 import com.teste.testeUnitarios.expections.NaoPodeDividirPorZeroException;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class Calculadora {
 
 	public int somar(int a, int b) {
@@ -18,6 +20,10 @@ public class Calculadora {
 			throw new NaoPodeDividirPorZeroException();
 		}
 		return a / b;
+	}
+
+	public void imprimi(){
+		log.info("PAssei");
 	}
 
 

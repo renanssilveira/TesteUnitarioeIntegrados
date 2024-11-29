@@ -28,6 +28,10 @@ public class CalculadoraMockTest {
 		Mockito.when(calcSpy.somar(1,3)).thenReturn(3);
 		log.info(String.valueOf(calcMock.somar(1, 2)));
 		log.info(String.valueOf(calcSpy.somar(1, 2)));
+		log.info("Mock");
+		calcMock.imprimi();
+		log.info("Spy");
+		calcSpy.imprimi();
 	}
 
 
