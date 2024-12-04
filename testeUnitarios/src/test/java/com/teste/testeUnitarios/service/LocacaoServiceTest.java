@@ -16,7 +16,11 @@ import org.hamcrest.CoreMatchers;
 import org.junit.*;
 import org.junit.rules.ErrorCollector;
 import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
 import org.mockito.*;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 import java.util.*;
 
@@ -235,6 +239,7 @@ public class LocacaoServiceTest {
         filmes.add(new Filme("teste4", 5, 10.00));
         filmes.add(new Filme("teste5", 5, 10.00));
         filmes.add(new Filme("teste6", 5, 10.00));
+
         //ação
         Locacao locacao = service.alugarFilme(usuario, filmes);
 
